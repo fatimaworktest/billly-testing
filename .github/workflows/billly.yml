@@ -65,7 +65,7 @@ jobs:
       - name: Manifest Generation
         run: |
           ./billy generate \
-            --access-token "${{ secrets.GITHUB_TOKEN }}" \
+            --access-token "${{ secrets.TOKEN }}" \
             --aqua-key "${{ secrets.DEV_AQUA_KEY }}" \
             --aqua-secret "${{ secrets.DEV_AQUA_SECRET }}" \
             --cspm-url https://stage.api.cloudsploit.com \
