@@ -20,9 +20,9 @@ jobs:
           # To enable reachability scanning, add: --reachability
           # To enable npm/dotnet/gradle non-lock file scanning, add: --package-json / --dotnet-proj / --gradle
         env:
-          AQUA_KEY: ${{ secrets.AQUA_KEY }}
-          AQUA_SECRET: ${{ secrets.AQUA_SECRET }}
-          GITHUB_TOKEN: ${{ secretsTOKEN }}
+          AQUA_KEY: ${{ secrets.Dev_AQUA_KEY }} z
+          AQUA_SECRET: ${{ secrets.DEV_AQUA_SECRET }}
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
           AQUA_URL: https://api.dev.supply-chain.cloud.aquasec.com
           CSPM_URL: https://stage.api.cloudsploit.com
           TRIVY_RUN_AS_PLUGIN: 'aqua'
