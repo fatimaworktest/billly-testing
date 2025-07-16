@@ -7,18 +7,12 @@ on:
         description: "increase version - yes/no"
         default: "yes"
         required: false
-      useDevBilly:
-        description: "Download and use dev Billy version instead of prod?"
-        required: false
-        default: "no"
-        type: choice
-        options:
-          - "yes"
-          - "no"
+      # deployTo:
+      #   description: 'comma separated list of envs to deploy'hjysdasyjuhjsassasasdasasdasasdjdsfjfsd
 
 jobs:
   build:
-    if: ${{ ( github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '#build') || (github.ref == 'refs/heads/main') || (github.ref == 'refs/heads/master')) && !contains(github.event.head_commit.message, '#skip-build') }}
+    if: ${{ ( github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '#build') || (github.ref  == 'refs/heads/main') || (github.ref  == 'refs/heads/master')) && !contains(github.event.head_commit.message, '#skip-build') }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the repo
@@ -37,33 +31,17 @@ jobs:
           echo "Commit: ${{ env.GITHUB_SHA }}"
           echo "Branch: ${{ env.GITHUB_REF }}"
 
-      - name: Install Billy
-        run: |
-          if [ "${{ inputs.useDevBilly }}" == "yes" ]; then
-            echo "message=Failed downloading Billy dev" >> $GITHUB_ENV
-            curl -sLo billy-pre-release-testing.tar.gz \
-              https://github.com/fatimaworktest/billly-testing/releases/download/test-billy-tag/billy-pre-release-testing.tar.gz
-            file billy-pre-release-testing.tar.gz
-            tar -xzf billy-pre-release-testing.tar.gz
-            mv billy-pre-release-testing/billy .
-            chmod +x ./billy
-            ./billy --version
-          else
-            echo "message=Failed downloading Billy prod" >> $GITHUB_ENV
-            export BILLY_SERVER=https://billy.dev-aqua.codesec.aquasec.com
-            curl -sLo install.sh download.codesec.aquasec.com/billy/install.sh
-            curl -sLo install.sh.checksum https://github.com/argonsecurity/releases/releases/latest/download/install.sh.checksum
-            if ! cat install.sh.checksum | sha256sum --check; then
-              echo "install.sh checksum failed"
-              exit 1
-            fi
-            BINDIR="." sh install.sh
-            rm install.sh install.sh.checksum
-            ./billy --version
-          fi
-
       - name: Manifest Generation
         run: |
+          export BILLY_SERVER=https://billy.dev-aqua.codesec.aquasec.com
+          curl -sLo install.sh download.codesec.aquasec.com/billy/install.sh
+          curl -sLo install.sh.checksum https://github.com/argonsecurity/releases/releases/latest/download/install.sh.checksum
+          if ! cat install.sh.checksum | sha256sum --check; then
+          echo "install.sh checksum failed"
+          exit 1
+          fi
+          BINDIR="." sh install.sh
+          rm install.sh install.sh.checksum
           ./billy generate \
             --access-token "${{ secrets.TOKEN }}" \
             --aqua-key "${{ secrets.DEV_AQUA_KEY }}" \
@@ -71,8 +49,7 @@ jobs:
             --cspm-url https://stage.api.cloudsploit.com \
             --artifact-path .
 
-          # Example for docker image name:tag:
-          # ./billy generate --artifact-path "my-image-name:${{ env.tag-version }}"
-
-          # OR path to your app root folder:
-          # ./billy generate --artifact-path "${{ env.MY_APP_ROOT }}"
+            # The docker image name:tag of the newly built image
+            # --artifact-path "my-image-name:${{ env.tag-version }}" 
+            # OR the path to the root folder of your project. I.e my-repo/my-app 
+            # --artifact-path "${{env.MY_APP_ROOT}}"
